@@ -1,0 +1,25 @@
+.l-modal {
+  display: grid;
+  align-items: center;
+  z-index: 1;
+  position: fixed;
+  height: 75%;
+  grid-template-rows: 95% 5%;
+}
+
+/* .modal-img {
+  max-height: 95%;
+  width: auto;
+} */
+
+.modal-img {
+  max-height: 100%;
+}
+
+.modal-caption {
+  color: hsl(100, 100%, 99%);
+  height: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

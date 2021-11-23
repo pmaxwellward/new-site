@@ -1,0 +1,139 @@
+@import "./globals.scss";
+@import "./PortfolioItem.scss";
+
+// Components
+
+@import "../components/AnimationItem.scss";
+@import "../components/Backdrop.scss";
+@import "../components/ImageModal.scss";
+@import "../components/NavBar.scss";
+@import "../components/WorkLink.scss";
+@import "../components/Post.scss";
+
+// Pages
+@import "../pages/illustration.scss";
+@import "../pages/info.scss";
+@import "../pages/web.scss";
+@import "../pages/work.scss";
+
+.gif-Man,
+.text-Box {
+  width: 100%;
+  max-height: 889px;
+  display: block;
+  /* margin: auto;
+    max-height: 80vh;
+    position: absolute;
+    left:0;
+    right:0; */
+}
+
+.text-Box {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.gif-Man img,
+.text-Box img {
+  /* display: block;
+    margin: auto;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    visibility: visible; */
+  width: 100%;
+}
+
+.load-GIF {
+  height: 150px;
+  width: 150px;
+  margin: auto;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  position: absolute;
+  top: 35%;
+  background: url(./loader.png);
+  -webkit-animation: animate 0.75s steps(14) infinite;
+  animation: animate 0.75s steps(14) infinite;
+}
+
+.overlay {
+  width: calc(0.675 * 80vh);
+  height: 889px;
+  display: block;
+  margin: auto;
+  max-height: 80vh;
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 1);
+  z-index: 2;
+}
+
+.fadeOut {
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: visibility 0s 0.15s, opacity 0.15s ease-out;
+  -o-transition: visibility 0s 0.15s, opacity 0.15s ease-out;
+  transition: visibility 0s 0.15s, opacity 0.15s ease-out;
+}
+@-webkit-keyframes animate {
+  from {
+    background-position: 0;
+  }
+  to {
+    background-position: 2100px;
+  }
+}
+@keyframes animate {
+  from {
+    background-position: 0;
+  }
+  to {
+    background-position: 2100px;
+  }
+}
+
+.gif-Man img {
+  cursor: pointer;
+}
+
+.flex-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.l-mascot {
+  aspect-ratio: 600 / 889;
+  width: 550px;
+  position: relative;
+}
+
+@media only screen and (max-width: 600px) {
+  .l-mascot {
+    width: 95%;
+  }
+}
+
+.loading-screen {
+  opacity: 1;
+}
+
+.debug {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.isNot-Speaking {
+  visibility: hidden;
+}
+
+.is-Speaking {
+  visibility: visible;
+}

@@ -1,0 +1,16 @@
+.post {
+  padding: 2em;
+  width: 60%;
+  border: 1px solid #e6e6e6;
+  margin: 2em;
+}
+
+.post-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  img {
+    max-height: 400px;
+  }
+}
