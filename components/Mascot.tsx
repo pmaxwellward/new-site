@@ -10,27 +10,27 @@ interface IProps {
 
 const Mascot = (props: IProps) => {
     
-    
-    const SPEAK_LENGTH = 3500                                                                           // length of time blurb GIF remains on screen
-    const FLY_REPEAT = 3;                                                                               // iterations of fly animation
-    const LOOP = Math.floor(Math.random() * (Math.floor(5) - Math.ceil(3) + 1) + Math.ceil(3));         // random loop amount
-
     // Shuffle text arrays once
-    useEffect(() => {
+       useEffect(() => {
         shuffle(introGIFs);
         shuffle(flyGIFs);
         shuffle(angerGIFs);
         shuffle(blurbGIFs)
     }, [])
 
+    const SPEAK_LENGTH = 3500                                                                           // length of time blurb GIF remains on screen
+    const FLY_REPEAT = 3;                                                                               // iterations of fly animation
+    const LOOP = Math.floor(Math.random() * (Math.floor(5) - Math.ceil(3) + 1) + Math.ceil(3));         // random loop amount
+    const INTRO_SCRIPT = [firstGIFs[0], introGIFs[0]];
+
     // States
     const [currentGIF, setCurrentGIF] = useState(manGIFs[0]);
     const [currentText, setText] = useState(firstGIFs[0][0]);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isIntro, setIsIntro] = useState(true);
-    const [blurbState, setBlurbState] = useState({array: [firstGIFs[0], introGIFs[0]], current: 0})
-    const [angerState, setAngerState] = useState({array: angerGIFs, current: 0})
-    const [introState, setIntroState] = useState({array: blurbGIFs, current: 0})
+    const [blurb, setBlurb] = useState(0)
+    const [anger, setAnger] = useState(0)
+    const [intro, setIntro] = useState(0)
 
 
     // GIF controller, updates when currentGIF state changes
@@ -40,7 +40,7 @@ const Mascot = (props: IProps) => {
         if(!props.loading) {
 
             if(isIntro) {
-                setCurrentGIF(manGIFs[19]);
+                setCurrentGIF(manGIFs[13]);
             }
             
             // loop lipSync animation while the mascot is speaking
@@ -87,18 +87,20 @@ const Mascot = (props: IProps) => {
         return a;
     }
 
+    //TODO bug lives here. Check by GIF nae
+
     function findScript() {
-        if (isIntro) {
+        if (/first|intro/g.test(currentText)) {
             setIsIntro(false);
-            return introState;
+            return {array: INTRO_SCRIPT, current: intro};
         }
 
-        if (/anger/g.test(currentGIF.src)) {
-            return angerState;
+        if (/anger/g.test(currentText)) {
+            return {array: angerGIFs, current: anger};
         }
 
-        if (/blurb/g.test(currentGIF.src)) {
-            return blurbState;
+        if (/blurb/g.test(currentText)) {
+            return {array: blurbGIFs, current: blurb};
         }
     }
 
@@ -114,15 +116,15 @@ const Mascot = (props: IProps) => {
 
     function mountText(script: {array: string[][], current: number}, subIdx?: number) {
 
-        let array = script.array;
+        let arr = script.array;
         let index = script.current;
         
         subIdx = subIdx || 0;
         console.log(subIdx);
            
-        if (subIdx < array[index].length) {
+        if (subIdx < arr[index].length) {
         
-            setText(array[index][subIdx]);
+            setText(arr[index][subIdx]);
         
             subIdx++;
         
@@ -149,13 +151,13 @@ const Mascot = (props: IProps) => {
         if (scriptMatch)
             switch(scriptMatch[0]) {
                 case ("first" || "intro"):
-                    setIntroState({...introState, current: (introState.current < introState.array.length) ? introState.current++ : 0 });
+                    setIntro((intro < INTRO_SCRIPT.length) ? intro + 1 : 0 );
                     break;
                 case "anger":
-                    setAngerState({...angerState, current: (angerState.current < angerState.array.length) ? angerState.current++ : 0 });
+                    setAnger((anger < angerGIFs.length) ? anger + 1 : 0 );
                     break;
                 case "blurb":
-                    setBlurbState({...blurbState, current: (blurbState.current < blurbState.array.length) ? blurbState.current++ : 0 });
+                    setBlurb((blurb < blurbGIFs.length) ? blurb + 1 : 0 );
                     break;
             }
     }
@@ -167,9 +169,9 @@ const Mascot = (props: IProps) => {
                 <p>loading: {props.loading.toString()}</p>
                 <p>isSpeaking: {isSpeaking.toString()}</p>
                 <p>currentText: {currentText} </p>
-                <p>Intro: {{...introState}} </p>
-                <p>Anger: {{...angerState}} </p>
-                <p>Blurb: {{...blurbState}} </p>
+                <p>Intro: {intro} </p>
+                <p>Anger: {anger} </p>
+                <p>Blurb: {blurb} </p>
                 <p>name: {currentGIF.name}</p>
                 <p>next: {currentGIF.next[0]}</p>
                 <p>src: {currentGIF.src}</p>
