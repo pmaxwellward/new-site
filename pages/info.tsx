@@ -1,12 +1,25 @@
+import Link  from 'next/link'
+
 
 const InfoRoute = () => {
+
+     function scramble() {
+        let s = '@';
+        let n = 'pmaxwellward';
+        let k = 'gmail.com';
+        let e = n + s + k;
+        let l = '{{spam@cia.gov}}'.replace(/{{.+?(}})/g, e);
+        
+        return l;
+     }
+
     return (
         <main className="l-info">
-            <div>
+            <p>
                 Hello<br/> 
                 <br/>
                 I respect your time,<br/>
-                so I'll be brief.<br/>
+                so I&apos;ll be brief.<br/>
                 <br/>
                 - Fullstack Development<br/>
                 - 2D/3D Animation<br/>
@@ -19,12 +32,12 @@ const InfoRoute = () => {
                 A: Yeah, a couple!<br/> 
                 <br/>
                 Check out my <br/>
-                <a href = "/work"><b>WORK</b></a> | <a href = "files/pmaxwellward_resume_2022.pdf"><b>Resume</b></a><br/>
+                <Link href="/work" passHref><a ><b>WORK</b></a></Link> | <Link href="files/pmaxwellward_resume_2022.pdf"><a><b>Resume</b></a></Link><br/>
                 for more info.<br/>
                 <br/>
-                <strong><a href={`mailto:pmaxwellward@gmail.com`}>{`pmaxwellward@gmail.com`}</a></strong>
+                <strong><Link href={`mailto:${scramble()}`} passHref><a>{scramble()}</a></Link></strong>
                 <br/>
-            </div>
+            </p>
         </main>
     );
 }

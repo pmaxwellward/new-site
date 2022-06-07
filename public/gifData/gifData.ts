@@ -109,8 +109,8 @@ export const manGIFs = [
         src: "/GIFs/17.gif",
         length: 1166.666,
         next: ["anger_out"],
-        isSpeaking: true,
         looping: false,
+        isSpeaking: true
     },
     {
         name: "anger_out",
@@ -135,8 +135,8 @@ export const manGIFs = [
         src: "/GIFs/20.gif",
         length: 1875,
         next: ["lipSyncIdle_out"],
-        isSpeaking: true,
         looping: false,
+        isSpeaking: true,
     },
     {
         name: "lipSyncIdle_out",
@@ -245,7 +245,7 @@ export const introGIFs = [
 
     ["/GIFs/intro_00a.gif", "/GIFs/intro_00b.gif"],
     ["/GIFs/intro_01a.gif", "/GIFs/intro_01b.gif"],
-    ["/GIFs/intro_02.gif"],
+    // ["/GIFs/intro_02.gif"],
     ["/GIFs/intro_03a.gif", "/GIFs/intro_03b.gif"],
     ["/GIFs/intro_04a.gif", "/GIFs/intro_04b.gif"],
 

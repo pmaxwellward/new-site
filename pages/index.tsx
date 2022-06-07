@@ -8,6 +8,7 @@ const Home = () => {
 
   const [loading, setLoading] = useState(true);
   
+
   useEffect(() => {
     const man = manGIFs.map(a => a.src);
     const first = firstGIFs.map(a => a);
@@ -30,12 +31,11 @@ const Home = () => {
 
 
     return (
-      <div>
+      <>
         <LoadingScreen class={(loading) ? "" : "fadeOut"} />
         <Mascot loading={loading} />
-      </div>
+      </>
     );
-
 
 }
 
@@ -53,8 +53,5 @@ async function cacheImages(srcArray: string[]) {
 
   });
 
-  await Promise.all(promises)
-  .then((msg) =>{
-    console.log(msg);
-  });
+  await Promise.all(promises);
 }

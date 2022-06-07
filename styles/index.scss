@@ -9,12 +9,18 @@
 @import "../components/NavBar.scss";
 @import "../components/WorkLink.scss";
 @import "../components/Post.scss";
+@import "../components/Comment.scss";
+@import "../components/NewCommentForm.scss";
+@import "../components/ItemTitleBar.scss";
 
 // Pages
 @import "../pages/illustration.scss";
 @import "../pages/info.scss";
 @import "../pages/web.scss";
 @import "../pages/work.scss";
+@import "../pages/news/news.scss";
+@import "../pages/news/[slug].scss";
+@import "../pages/animation.scss";
 
 .gif-Man,
 .text-Box {
@@ -61,7 +67,7 @@
 }
 
 .overlay {
-  width: calc(0.675 * 80vh);
+  // width: calc(0.675 * 80vh);
   height: 889px;
   display: block;
   margin: auto;

@@ -1,8 +1,9 @@
 .illo-grid {
   display: grid;
   grid-template-columns: repeat(4, 300px);
-  grid-template-rows: repeat(8, 300px);
+  grid-template-rows: repeat(7, 300px);
   gap: 10px;
+  margin: 2em 0;
 
   img {
     width: 100%;
@@ -10,5 +11,12 @@
     object-position: bottom;
     height: 100%;
     cursor: pointer;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .illo-grid {
+    grid-template-columns: 300px;
+    grid-template-rows: repeat(27, 300px);
   }
 }

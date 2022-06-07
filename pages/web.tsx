@@ -107,7 +107,7 @@ const portfolioItems = [
 
 const WebRoute = () => {
     return (
-        <main>
+        <main className="work-main">
             <div className="web-intro">
                 With my background in animation/design and skills in fullstack web development, I build web applications that are clear, functional, and entertaining.<br/>
                 <br/>

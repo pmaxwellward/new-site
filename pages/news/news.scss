@@ -1,0 +1,23 @@
+.news-main {
+    flex-direction: column; 
+    width: 70%;
+    position: relative;
+    margin: auto;
+    
+    @media only screen and (max-width: 600px) {
+        width: 100%;
+    }
+
+    .l-pagination {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        margin: 3em;
+
+        button {
+            border: none;
+            font-family: inherit;
+            background: none;
+        }
+    }
+}

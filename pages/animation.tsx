@@ -111,12 +111,14 @@ const animationItems = [
 
 const AnimationRoute = () => {
     return (
-        <main>
+        <main className="animation-main">
+            <div className="animation-items">
             {
                 animationItems.map((item) => 
                     <AnimationItem key={item.id} {...item} /> 
                 )
             }
+            </div>
         </main>
     );
 }

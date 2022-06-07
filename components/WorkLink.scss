@@ -2,12 +2,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
 }
 
 .work-link-title {
   max-width: 50%;
 }
 
-.work-link-thumbnail {
+.work-link-thumb {
   max-width: 100%;
 }

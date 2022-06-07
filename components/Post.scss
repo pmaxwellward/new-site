@@ -1,16 +1,49 @@
 .post {
   padding: 2em;
-  width: 60%;
+  // width: 100%;
   border: 1px solid #e6e6e6;
-  margin: 2em;
+  margin: 2em 0;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .l-comments-link {
+    height: 1em;
+  }
+
+  .comments-link {
+    float: right;
+  }
 }
 
 .post-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 1em;
+
+  p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media only screen and (max-width: 600px) {
+    p {
+      flex-direction: column;
+    }
+  }
 
   img {
     max-height: 400px;
+    margin: 0.5em;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .post {
+    padding: 2em 1em;
   }
 }

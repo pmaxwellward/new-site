@@ -20,7 +20,7 @@ const ItemTitleBar = (props: Props) => {
     } else {
         return (
             <div className="title-bar">
-                <div className="item-title">{props.title}</div>
+                <div className="item-title-anim">{props.title}</div>
             </div>
         );
     }

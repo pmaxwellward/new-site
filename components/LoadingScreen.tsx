@@ -1,4 +1,3 @@
-import { getStaticProps } from "../pages/news";
 
 interface ILoadingScreen {
     class: string;

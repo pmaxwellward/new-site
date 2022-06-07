@@ -1,0 +1,22 @@
+.comment {
+  padding: 2em 0;
+  border-bottom: 1px solid hsl(0, 0%, 95%);
+  div {
+    margin-bottom: 1em;
+  }
+}
+
+.comment-date {
+  font-size: 0.9em;
+  color: grey;
+}
+
+.admin {
+  color: blue;
+  font-weight: 900;
+
+  &:before {
+    content: "\2042";
+    margin-right: 0.5em;
+  }
+}

@@ -1,4 +1,12 @@
 .animation-item {
   max-width: 600px;
   margin-bottom: 2.5em;
+
+  a img {
+    max-width: 100%;
+  }
+}
+
+.item-info {
+  padding: 1em;
 }

@@ -1,0 +1,151 @@
+.form-toggle {
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+.l-comment-form {
+  padding: 1em;
+}
+
+.new-comment-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  input {
+    width: 100%;
+    border-radius: unset;
+    padding: 2px;
+    border-style: solid;
+    border-width: 1px;
+    margin-bottom: 1em;
+    line-height: 2em;
+    font-family: inherit;
+    outline: none;
+  }
+
+  textarea {
+    width: 100%;
+    resize: none;
+    outline: none;
+    overflow-y: scroll;
+    margin-bottom: 1em;
+  }
+
+  label {
+    width: 33.333%;
+    margin: 1em auto 1em 0;
+    
+    @media only screen and (max-width: 600px) {
+      width: 100%;
+    }
+
+    input {
+      margin-top: 1em;
+    }
+  }
+
+  .l-captcha {
+    width: 33.333%;
+    display: flex;
+    position: relative;
+
+    @media only screen and (max-width: 600px) {
+      width: 100%;
+    }
+
+    canvas {
+      width: 90%;
+      height: 100px;
+      font-size: 30px;
+      letter-spacing: 5px;
+      margin-right: auto;
+      display: block;
+      background-color: #eee;
+    }
+
+    .l-captcha-icons {
+      width: 10%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      cursor: pointer;
+
+      img {
+        width: 66.666%;
+      }
+    }
+  }
+
+  button {
+    padding: 0.5em 2em;
+    border-radius: 0;
+    background-color: transparent;
+    border-style: outset;
+    border-width: 1px;
+    font-family: inherit;
+
+    @media only screen and (max-width: 600px) {
+      width: 50%;
+    }
+  }
+}
+
+.form-toggle {
+  cursor: pointer;
+
+  @media only screen and (max-width: 600px) {
+    margin: 1em;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.correct {
+  display: inline;
+  color: green;
+}
+
+.correct::after {
+  content: "correct \2713"
+}
+
+.incorrect {
+  display: inline;
+  color: red;
+}
+
+.incorrect::after {
+  content: "incorrect \2716";
+}
+
+.enabled {
+  cursor: pointer;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
+.comment-ok {
+  background: hsl(150, 100%, 75%);
+  padding: 20px;
+}
+
+.comment-ok::after {
+  content: "Comment posted successfully. It will show up in the comments section at a later time.";
+}
+
+.comment-fail {
+  background: hsl(0, 100%, 66%);
+  padding: 20px;
+}
+
+.comment-fail::after {
+  content: "Comment not posted successfully. Please re-try.";
+}
