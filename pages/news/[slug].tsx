@@ -54,7 +54,7 @@ const NewsRoute = ({ post }: InferGetStaticPropsType<typeof getStaticProps>) => 
             published_at: null
         }
 
-        let res = await fetch("http://localhost:1337/comments", {
+        let res = await fetch("https://news-pmw.herokuapp.com/comments", {
                 method: 'POST',
                 body: JSON.stringify(comment),
                 headers: {
@@ -84,7 +84,7 @@ export default NewsRoute;
 
 
 export const getStaticPaths: GetStaticPaths = async () => {
-    const res = await fetch(`http://localhost:1337/posts`);
+    const res = await fetch(`${process.env.API_URL}/posts`);
     const posts: IPost[] = await res.json();
 
     const paths = posts.map((post) => ({
@@ -101,7 +101,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
     const { slug } = context.params!;
 
-    const res = await fetch(`http://localhost:1337/posts?slug=${slug}`);
+    const res = await fetch(`${process.env.API_URL}/posts?slug=${slug}`);
 
     const data = await res.json();
 
@@ -110,7 +110,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     const window: any = new JSDOM('').window
     const DOMPurify = createDOMPurify(window);
 
-    post.content = post.content.replace(/\/uploads\//g, "http://localhost:1337/uploads/");
+    post.content = post.content.replace(/\/uploads\//g, `${process.env.API_URL}/uploads/`);
     post.content = DOMPurify.sanitize(marked.parse(post.content));
 
     return {

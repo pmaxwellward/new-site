@@ -51,17 +51,17 @@ export async function getServerSideProps({ query: {page = 1} }) {
     const limit = 5
     const start = +page === 1 ? 0 : (+page - 1) * 5
 
-    const res = await fetch(`http://localhost:1337/posts?_sort=published_at:DESC&_start=${start}&_limit=${limit}`);
+    const res = await fetch(`${process.env.API_URL}/posts?_sort=published_at:DESC&_start=${start}&_limit=${limit}`);
     const posts: IPost[] = await res.json();
 
-    const countRes = await fetch(`http://localhost:1337/posts/count`);
+    const countRes = await fetch(`${process.env.API_URL}/posts/count`);
     const countData: number = await countRes.json();
 
     const window: any = new JSDOM('').window
     const DOMPurify = createDOMPurify(window);
 
     posts.map((post) => {
-        post.content = post.content.replace(/\/uploads\//g, "http://localhost:1337/uploads/");
+        post.content = post.content.replace(/\/uploads\//g, `${process.env.API_URL}/uploads/`);
         post.content = DOMPurify.sanitize(marked.parse(post.content));
     });
 
