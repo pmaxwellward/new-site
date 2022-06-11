@@ -21,7 +21,7 @@
 .post-content {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   margin: 1em;
 
   p {
@@ -37,7 +37,7 @@
 
   img {
     max-height: 400px;
-    margin: 0.5em;
+    margin-right: 0.5em;
   }
 }
 
