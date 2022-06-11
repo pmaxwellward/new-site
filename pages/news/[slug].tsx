@@ -16,7 +16,7 @@ interface IPost {
     title: string;
     slug: string;
     content: string;
-    comments: string[];
+    comments: IComment[];
     published_at: string;
     created_at: string;
     updated_at: string;
