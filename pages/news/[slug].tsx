@@ -111,7 +111,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     const DOMPurify = createDOMPurify(window);
 
     post.content = post.content.replace(/\/uploads\//g, `${process.env.API_URL}/uploads/`);
-    post.content = DOMPurify.sanitize(marked.parse(post.content));
+    post.content = DOMPurify.sanitize(marked.parse(post.content), { ALLOWED_TAGS: ["iframe"], ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'] });
 
     return {
         props: { post }

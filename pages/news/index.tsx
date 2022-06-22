@@ -62,7 +62,7 @@ export async function getServerSideProps({ query: {page = 1} }) {
 
     posts.map((post) => {
         post.content = post.content.replace(/\/uploads\//g, `${process.env.API_URL}/uploads/`);
-        post.content = DOMPurify.sanitize(marked.parse(post.content));
+        post.content = DOMPurify.sanitize(marked.parse(post.content), { ALLOWED_TAGS: ["iframe"], ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling'] });
     });
 
 
