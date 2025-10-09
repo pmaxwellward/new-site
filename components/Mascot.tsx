@@ -240,17 +240,19 @@ export default function MascotIntro({ loading }: Props) {
     return Array.isArray(frames) ? (frames as string[]) : [String(frames)];
   }
 
-  // preload on mount
   useEffect(function () {
-    var all = []
-      .concat(manGIFs.map(function (g) { return g.src; }))
-      .concat(firstGIFs.flat())
-      .concat(introGIFs.flat())
-      .concat(blurbGIFs.flat())
-      .concat(angerGIFs.flat())
-      .concat(flyGIFs.map(function (f) { return f.src; }));
-    preload(all as string[]);
+    const all: string[] = [
+      ...manGIFs.map(function (g) { return g.src; }),
+      ...(firstGIFs.flat()),
+      ...(introGIFs.flat()),
+      ...(blurbGIFs.flat()),
+      ...(angerGIFs.flat()),
+      ...flyGIFs.map(function (f) { return f.src; }),
+    ];
+    preload(all);
   }, []);
+
+
 
   // initialize shuffle orders when ready
   useEffect(function () {

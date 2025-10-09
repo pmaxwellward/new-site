@@ -1,4 +1,5 @@
 import WebItem from "../components/WebItem";
+import Link  from 'next/link'
 
 const portfolioItems = [
         {
@@ -112,7 +113,7 @@ const WebRoute = () => {
                 On the back end: ASP.NET Core, Node.js and Python while using REST/GraphQL APIs and SQL databases.<br/>
                 In AI: LLM-powered features, retrieval/embeddings, prompt tooling, and evaluation to keep things reliable.<br/>
             </p>
-            <p>I have also had a career as an animator and illustrator. <a href="/animation">Animation</a> <a href="/illustration" >Illustration</a></p>
+            <p>I have also had a career as an animator and illustrator. <Link href="/animation">Animation</Link> <Link href="/illustration" >Illustration</Link></p>
             <p>Below are samples of my work with notes on the tech used.</p>
 
             </div>
