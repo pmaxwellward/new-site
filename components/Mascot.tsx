@@ -1,256 +1,513 @@
-import { manGIFs, firstGIFs, introGIFs, flyGIFs, angerGIFs, blurbGIFs } from '../public/gifData/gifData';
-import { IManGIF, IFlyGIF } from '../public/gifData/gifData';
-import { useEffect, useState, useRef } from 'react'
+"use client";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  manGIFs,
+  firstGIFs,
+  introGIFs,
+  IManGIF,
+  blurbGIFs,
+  IFlyGIF,
+  flyGIFs,
+  angerGIFs,
+} from "../public/gifData/gifData";
 
-interface IProps {
-    loading: boolean;
+interface Props {
+  loading: boolean;
 }
 
-const Mascot = (props: IProps) => {
+type Mode = "intro" | "idle" | "fly";
 
-    const SPEAK_LENGTH = 3000                                                                           // length of time blurb GIF remains on screen
-    const INTRO = Math.floor(Math.random() * (Math.floor(3) - Math.ceil(0) + 1) + Math.ceil(0));        // random index for intro GIFs, shuffle algo does not work for intro GIFs ¯\_(ツ)_/¯
-    const INTRO_SCRIPT = [[firstGIFs[INTRO][0], introGIFs[INTRO][0],introGIFs[INTRO][1]]];            
-    
-    let loadingGIF: NodeJS.Timeout;
-    let loadingText: NodeJS.Timeout;
-    
-    // States
-    const [currentGIF, setCurrentGIF] = useState<IManGIF | IFlyGIF>(manGIFs[0]);
-    const [isSpeaking, setIsSpeaking] = useState(false);
-    const [currentText, setCurrentText] = useState(firstGIFs[0][0]);
-    const [isIntro, setIsIntro] = useState(true);
+const SPEAK_LENGTH = 3000; // ms per text frame
 
-    const isFlyingRef = useRef(false);
-    const blurbRef = useRef(0);
-    const angerRef = useRef(0);
-    
-    // Shuffle text arrays once
-    useEffect(() => {
-        shuffle(angerGIFs);
-        shuffle(blurbGIFs)
-    }, [])
-    
-    // hardcoded intro animation
-    useEffect(() => {
-        
-        if (!props.loading) {
+// ----------------------- Helpers (module scope) -----------------------
 
-            promiseGIF(findGIF("idle_in"))
-            .then(() => {
-                return promiseGIF(findGIF("lipSyncIdle_in"));
-            })
-            .then(() => {
-                mountText({ array: INTRO_SCRIPT, current: 0 });
-                setIsSpeaking(true);
-                setIsIntro(false)
-                return promiseGIF(findGIF("lipSyncIdle"));
-            })
-        }
-        
+function byName(name: string): IManGIF {
+  const g = manGIFs.find(function (m) {
+    return m.name === name;
+  });
+  if (!g) throw new Error("GIF not found: " + name);
+  return g;
+}
 
-    }, [props.loading])
+function preload(srcs: string[]) {
+  for (var i = 0; i < srcs.length; i++) {
+    var img = new Image();
+    img.decoding = "async";
+    img.loading = "eager";
+    img.src = srcs[i];
+  }
+}
 
-    // GIF controller, updates when currentGIF state changes
-    useEffect(() => {
-        
-        // wait until images are cached before running
-        if(!isIntro && !isFlyingRef.current) {
+function sleep(ms: number, signal: AbortSignal) {
+  return new Promise<void>(function (resolve) {
+    var t = setTimeout(resolve, ms);
 
-            // loop lipSync animation while the mascot is speaking
-            if (!isSpeaking && "next" in currentGIF) {
-                let next = findNext(currentGIF.next.length)
-
-                // wait for GIF animation to end, then load next GIF
-                loadingGIF = setTimeout(()=> { 
-                    
-                    // if next GIF is a lipSync, begin loop on next render
-                    if(next) {
-                        if(next.isSpeaking) {
-                            setIsSpeaking(true);
-                        }
-                        setCurrentGIF(next);
-                    } 
-
-                    // if current gif is a looping GIF, set timeout for the GIF length multiplied by a random int between 3-5
-                }, currentGIF.looping ? currentGIF.length * Math.floor(Math.random() * (Math.floor(5) - Math.ceil(3) + 1) + Math.ceil(3)) : currentGIF.length);
-            }
-        }
-
-        return () => {
-            clearTimeout(loadingGIF);
-            clearTimeout(loadingText);
-        }
-
-    }, [currentGIF]);
-
-    // Text controller. Recursively mounts text while isSpeaking is true. 
-    useEffect(() => {
-        if(!props.loading && !isIntro) {
-            
-            let script = findScript()!;
-
-            if(isSpeaking) {
-                mountText(script);
-            } else {
-                unmountText();
-            }
-        }
-    }, [isSpeaking]);
-  
-    // used when you need a promise returned when a GIF is complete
-    function promiseGIF(gif: IManGIF | IFlyGIF) {
-        setCurrentGIF(gif);
-        return new Promise((resolve, reject) => {
-            if ("src" in gif) {
-                setTimeout(() => {
-                    resolve(`${gif.name} is set`);
-                }, gif.length)
-            } else {
-                reject("there is no src property in gif argument");
-            }
-        })
+    function onAbort() {
+      clearTimeout(t);
+      resolve();                     // <- no reject on abort
     }
 
-    // array shuffler
-    function shuffle(a: any[]) {
-        var j, x, i;
-        for (i = a.length - 1; i > 0; i--) {
-            j = Math.floor(Math.random() * (i + 1));
-            x = a[i];
-            a[i] = a[j];
-            a[j] = x;
-        }
-        return a;
+    if (signal.aborted) {
+      onAbort();
+      return;
+    }
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+
+function randInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+async function ensureDecoded(src: string, signal: AbortSignal): Promise<void> {
+  return new Promise<void>(function (resolve) {
+    if (signal.aborted) {            // <- resolve, don’t reject
+      resolve();
+      return;
     }
 
-    // Find which dialogue script to load
-    function findScript() {
+    var img: any = new Image();
+    function onAbort() {
+      resolve();                     // <- resolve on abort
+    }
+    signal.addEventListener("abort", onAbort, { once: true });
 
-        // Angry lipsync or normal lipsync
-        if (/anger|fly/g.test(currentGIF.name)) {
-            return {array: angerGIFs, current: angerRef.current};
+    img.decoding = "async";
+    img.loading = "eager";
+
+    img.onload = function () {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    };
+    img.onerror = function () {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    };
+
+    img.src = src;
+
+    if (typeof img.decode === "function") {
+      img
+        .decode()
+        .catch(function () { /* ignore */ })
+        .finally(function () {
+          signal.removeEventListener("abort", onAbort);
+          resolve();
+        });
+    }
+  });
+}
+
+type ImgRef = { current: HTMLImageElement | null };
+
+function absoluteURL(path: string): string {
+  var a = document.createElement("a");
+  a.href = path;
+  return a.href;
+}
+
+function setSpeakingDom(textRef: ImgRef, value: boolean): void {
+  var el = textRef.current;
+  if (!el) return;
+  el.className = value ? "is-Speaking" : "isNot-Speaking";
+  el.style.visibility = value ? "visible" : "hidden";
+}
+
+function setTextSrc(textRef: ImgRef, src: string): void {
+  var el = textRef.current;
+  if (!el) return;
+  var desired = absoluteURL(src);
+  if (el.src !== desired) {
+    el.src = src;
+  }
+}
+
+function setGifSrc(gifRef: ImgRef, src: string): void {
+  var el = gifRef.current;
+  if (!el) return;
+  var desired = absoluteURL(src);
+  if (el.src !== desired) {
+    el.src = src;
+  }
+}
+
+// Force a GIF to restart by reassigning the same src.
+function restartGif(gifRef: ImgRef, src: string): void {
+  var el = gifRef.current;
+  if (!el) return;
+  el.src = src;
+}
+
+// Decode → set <gifRef>.src → wait duration
+async function showGIF(
+  name: string,
+  signal: AbortSignal,
+  gifRef: ImgRef
+): Promise<IManGIF> {
+  var g = byName(name);
+  await ensureDecoded(g.src, signal);
+  setGifSrc(gifRef, g.src);
+  await sleep(g.length, signal);
+  return g;
+}
+
+// fly helpers
+function shuffleFlyCopy(): IFlyGIF[] {
+  var arr = flyGIFs.slice();
+  for (var j = arr.length - 1; j > 0; j--) {
+    var k = Math.floor(Math.random() * (j + 1));
+    var tmp = arr[j];
+    arr[j] = arr[k];
+    arr[k] = tmp;
+  }
+  return arr;
+}
+function pickFlySequence(): IFlyGIF[] {
+  var arr = shuffleFlyCopy();
+  return [arr[0], arr[1], arr[2]];
+}
+async function showFlyClip(
+  clip: IFlyGIF,
+  signal: AbortSignal,
+  gifRef: ImgRef
+): Promise<void> {
+  await ensureDecoded(clip.src, signal);
+  setGifSrc(gifRef, clip.src);
+  await sleep(clip.length, signal);
+}
+
+// shuffle order builder
+function buildShuffledOrder(length: number): number[] {
+  var arr: number[] = [];
+  for (var i = 0; i < length; i++) arr.push(i);
+  for (var j = arr.length - 1; j > 0; j--) {
+    var k = Math.floor(Math.random() * (j + 1));
+    var tmp = arr[j];
+    arr[j] = arr[k];
+    arr[k] = tmp;
+  }
+  return arr;
+}
+
+// ----------------------- Component -----------------------
+
+export default function MascotIntro({ loading }: Props) {
+  const [mode, setMode] = useState<Mode>("intro");
+  const gifRef = useRef<HTMLImageElement | null>(null);
+  const textRef = useRef<HTMLImageElement | null>(null);
+
+  const INTRO_INDEX = useMemo(function () {
+    return Math.floor(Math.random() * introGIFs.length);
+  }, []);
+
+  const INTRO_SCRIPT = useMemo(function () {
+    var first = firstGIFs[INTRO_INDEX]?.[0] || firstGIFs[0][0];
+    var a = introGIFs[INTRO_INDEX]?.[0] || introGIFs[0][0];
+    var b = introGIFs[INTRO_INDEX]?.[1] || introGIFs[0][1];
+    return [first, a, b];
+  }, [INTRO_INDEX]);
+
+  // shuffled orders
+  const blurbOrderRef = useRef<number[]>([]);
+  const blurbPtrRef = useRef(0);
+  const angerOrderRef = useRef<number[]>([]);
+  const angerPtrRef = useRef(0);
+
+  function getNextBlurbFrames(): string[] {
+    var order = blurbOrderRef.current;
+    if (order.length === 0 || blurbPtrRef.current >= order.length) {
+      blurbOrderRef.current = buildShuffledOrder(blurbGIFs.length);
+      blurbPtrRef.current = 0;
+      order = blurbOrderRef.current;
+    }
+    var idx = order[blurbPtrRef.current];
+    blurbPtrRef.current = blurbPtrRef.current + 1;
+    var frames: any = blurbGIFs[idx];
+    return Array.isArray(frames) ? (frames as string[]) : [String(frames)];
+  }
+
+  function getNextAngerFrames(): string[] {
+    var order = angerOrderRef.current;
+    if (order.length === 0 || angerPtrRef.current >= order.length) {
+      angerOrderRef.current = buildShuffledOrder(angerGIFs.length);
+      angerPtrRef.current = 0;
+      order = angerOrderRef.current;
+    }
+    var idx = order[angerPtrRef.current];
+    angerPtrRef.current = angerPtrRef.current + 1;
+    var frames: any = angerGIFs[idx];
+    return Array.isArray(frames) ? (frames as string[]) : [String(frames)];
+  }
+
+  // preload on mount
+  useEffect(function () {
+    var all = []
+      .concat(manGIFs.map(function (g) { return g.src; }))
+      .concat(firstGIFs.flat())
+      .concat(introGIFs.flat())
+      .concat(blurbGIFs.flat())
+      .concat(angerGIFs.flat())
+      .concat(flyGIFs.map(function (f) { return f.src; }));
+    preload(all as string[]);
+  }, []);
+
+  // initialize shuffle orders when ready
+  useEffect(function () {
+    if (loading) return;
+    blurbOrderRef.current = buildShuffledOrder(blurbGIFs.length);
+    blurbPtrRef.current = 0;
+    angerOrderRef.current = buildShuffledOrder(angerGIFs.length);
+    angerPtrRef.current = 0;
+  }, [loading]);
+
+  // orchestrator cancellation
+  const abortRef = useRef<AbortController | null>(null);
+  async function start(run: (signal: AbortSignal) => Promise<void>) {
+    if (abortRef.current) {
+      abortRef.current.abort();
+    }
+    var ac = new AbortController();
+    abortRef.current = ac;
+    try {
+      await run(ac.signal);
+    } catch (err: any) {
+      if (!err || err.message === "aborted") {
+        // ignore
+      } else {
+        console.error(err);
+      }
+    }
+  }
+
+  // ----------- Intro flow -----------
+  useEffect(function () {
+    if (loading) return;
+
+    start(async function (signal: AbortSignal) {
+      await showGIF("idle_in", signal, gifRef);
+      await showGIF("lipSyncIdle_in", signal, gifRef);
+
+      var speaking = true;
+      setSpeakingDom(textRef, true);
+
+      const textP = (async function () {
+        for (var i = 0; i < INTRO_SCRIPT.length; i++) {
+          if (signal.aborted) return;
+          setTextSrc(textRef, INTRO_SCRIPT[i]);
+          await sleep(SPEAK_LENGTH, signal);
+        }
+        speaking = false;
+        setSpeakingDom(textRef, false);
+      })();
+
+      var lip = byName("lipSyncIdle");
+      await ensureDecoded(lip.src, signal);
+      // Keep lip moving until text completes by restarting each cycle
+      const lipLoop = (async function () {
+        while (!signal.aborted && speaking) {
+          restartGif(gifRef, lip.src);
+          await sleep(lip.length, signal);
+        }
+      })();
+
+      await lipLoop;
+      await showGIF("lipSyncIdle_out", signal, gifRef);
+      await textP;
+
+      setMode("idle");
+    });
+
+    return function () {
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, [loading, INTRO_SCRIPT]);
+
+  // ----------- Blurb speaking turn -----------
+  async function runBlurb(signal: AbortSignal): Promise<void> {
+    var frames = getNextBlurbFrames();
+
+    await showGIF("lipSyncIdle_in", signal, gifRef);
+
+    var speaking = true;
+    setSpeakingDom(textRef, true);
+
+    // start lip restarter
+    var lip = byName("lipSyncIdle");
+    await ensureDecoded(lip.src, signal);
+    const lipLoop = (async function () {
+      while (!signal.aborted && speaking) {
+        restartGif(gifRef, lip.src);
+        await sleep(lip.length, signal);
+      }
+    })();
+
+    for (var i = 0; i < frames.length; i++) {
+      if (signal.aborted) return;
+      setTextSrc(textRef, frames[i]);
+      await sleep(SPEAK_LENGTH, signal);
+    }
+
+    speaking = false;
+    setSpeakingDom(textRef, false);
+    await lipLoop;
+
+    await showGIF("lipSyncIdle_out", signal, gifRef);
+  }
+
+  // ----------- Anger speaking turn -----------
+async function runAnger(signal: AbortSignal): Promise<void> {
+  var frames = getNextAngerFrames();
+
+  // Show bubble immediately (first frame if present)
+  setSpeakingDom(textRef, true);
+  if (frames.length > 0) setTextSrc(textRef, frames[0]);
+
+  // Display anger_in once, then loop it by restarting the same GIF
+  var angerIn = byName("anger_in");
+  await ensureDecoded(angerIn.src, signal);
+  setGifSrc(gifRef, angerIn.src);
+
+  // Keep anger_in "moving" until text finishes
+  var speaking = true;
+  const angerLoop = (async function () {
+    while (!signal.aborted && speaking) {
+      // let the current anger_in play fully…
+      await sleep(angerIn.length, signal);
+      if (signal.aborted || !speaking) break;
+      // …then restart the same GIF to loop the motion
+      restartGif(gifRef, angerIn.src);
+    }
+  })();
+
+  // Advance remaining anger text frames (frame[0] already shown)
+  for (var i = 1; i < frames.length; i++) {
+    if (signal.aborted) return;
+    setTextSrc(textRef, frames[i]);
+    await sleep(SPEAK_LENGTH, signal);
+  }
+  // Single-frame case: still dwell for one speak interval
+  if (frames.length === 1) {
+    await sleep(SPEAK_LENGTH, signal);
+  }
+
+  // End together: stop loop, hide bubble, then anger_out
+  speaking = false;
+  await angerLoop;
+  setSpeakingDom(textRef, false);
+
+  await showGIF("anger_out", signal, gifRef);
+}
+
+
+  // ----------- Idle flow -----------
+  useEffect(function () {
+    if (loading) return;
+    if (mode !== "idle") return;
+
+    start(async function runIdle(signal: AbortSignal) {
+      await showGIF("idle", signal, gifRef);
+
+      while (!signal.aborted) {
+        await showGIF("idle_in", signal, gifRef);
+
+        // 0=head, 1=scratch, 2=blurb, 3=plain idle
+        var branch = Math.floor(Math.random() * 4);
+
+        if (branch === 0) {
+          await showGIF("idle_headIn", signal, gifRef);
+          var head = byName("idle_head");
+          await ensureDecoded(head.src, signal);
+          setGifSrc(gifRef, head.src);
+          var loops = randInt(3, 5);
+          await sleep(head.length * loops, signal);
+          await showGIF("idle_headOut", signal, gifRef);
+        } else if (branch === 1) {
+          await showGIF("headScratch_in", signal, gifRef);
+          var hs = byName("headScratch");
+          await ensureDecoded(hs.src, signal);
+          setGifSrc(gifRef, hs.src);
+          var loops2 = randInt(3, 5);
+          await sleep(hs.length * loops2, signal);
+          await showGIF("headScratch_out", signal, gifRef);
+        } else if (branch === 2) {
+          await runBlurb(signal);
         } else {
-            return {array: blurbGIFs, current: blurbRef.current};
+          var idle2 = byName("idle");
+          await ensureDecoded(idle2.src, signal);
+          setGifSrc(gifRef, idle2.src);
+          await sleep(idle2.length, signal);
         }
+      }
+    });
 
-    }
+    return function () {
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, [loading, mode]);
 
-    // find next GIF that is stored in next property
+  // ----------- Fly flow -----------
+  const flyGuardRef = useRef(false);
 
-    function findNext(length: number) {
-        const index = Math.floor(Math.random() * length);
-        
-        let next: IManGIF;
-        if("next" in currentGIF) {
-            next = findGIF(currentGIF.next[index]);
-            return next;
-        } else {
-            console.error("next property does not exist on currentGIF")
-        }   
+  function onMascotClick() {
+    if (flyGuardRef.current) return;
+    flyGuardRef.current = true;
+    setMode("fly");
+  }
 
-    }
+  useEffect(function () {
+    if (loading) return;
+    if (mode !== "fly") return;
 
-    function findGIF(query: string) {
-        let gif = manGIFs.find(({ name }) => {
-            return name === query;
-        })!;
+    start(async function runFly(signal: AbortSignal) {
+      setSpeakingDom(textRef, false);
 
-        return gif;
-    }
+      await showGIF("fly", signal, gifRef);
+      await showGIF("fly_in", signal, gifRef);
 
-    // mount text GIF from script to DOM
+      var seq = pickFlySequence();
+      await showFlyClip(seq[0], signal, gifRef);
+      await showFlyClip(seq[1], signal, gifRef);
+      await showFlyClip(seq[2], signal, gifRef);
 
-    function mountText(script: {array: string[][], current: number}, subIdx?: number) {
+      await showGIF("fly_out", signal, gifRef);
 
-        let arr = script.array;
-        let index = script.current;
-        
-        subIdx = subIdx || 0;
-           
-        if (subIdx < arr[index].length) {
-        
-            setCurrentText(arr[index][subIdx]);
-        
-            subIdx++;
-        
-            loadingText = setTimeout(() => {
-                mountText(script, subIdx) 
-            }, SPEAK_LENGTH);
+      // Anger speech immediately after fly_out
+      await runAnger(signal);
 
-        } else {
-            loadingText = setTimeout(() => {
-                setIsSpeaking(false);
-            }, SPEAK_LENGTH)
+      flyGuardRef.current = false;
+      setMode("idle");
+    });
 
-        }
-    }
+    return function () {
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, [loading, mode]);
 
-    // transition out of talking animation, and then increase index of script array
-
-    function unmountText() {
-
-        let next: IManGIF;
-        
-        if("next" in currentGIF) {
-            next = findNext(currentGIF.next.length)!;
-            setCurrentGIF(next);
-        }
-
-        const scriptMatch = currentText.match(/anger|blurb/g);
-        
-        if (scriptMatch != null)
-            switch(scriptMatch[0]) {
-                case "anger":
-                    angerRef.current = (angerRef.current < angerGIFs.length - 1) ? angerRef.current + 1 : 0;
-                    break;
-                case "blurb":
-                    blurbRef.current = (blurbRef.current < blurbGIFs.length - 1) ? blurbRef.current + 1 : 0 
-                    break;
-            }
-    }
-
-    function punch(e: any) {
-        if (!isFlyingRef.current) {
-            e.preventDefault();
-            clearTimeout(loadingGIF);
-            clearTimeout(loadingText);
-            setIsSpeaking(false);
-            isFlyingRef.current = true;
-            shuffle(flyGIFs);
-
-            promiseGIF(findGIF("fly"))
-            .then(()=> {
-                return promiseGIF(findGIF("fly_in"));
-             })
-            .then(()=> {
-                return promiseGIF(flyGIFs[0]);
-            })
-            .then(()=> {
-                return promiseGIF(flyGIFs[1]);
-            })
-            .then(()=> {
-                return promiseGIF(flyGIFs[2]); 
-            })
-            .then(()=> {
-                isFlyingRef.current = false;
-                return promiseGIF(findGIF("fly_out"));   
-            })
-        }
-    }
-
-    return (
-        <div className="flex-container">
-            <div className="l-mascot" onClick={(e) => {punch(e)} }>
-                <div className="text-Box">
-                    <img src={currentText} className={isSpeaking ? "is-Speaking" : "isNot-Speaking"} />
-                </div>
-                <div className="gif-Man">
-                    { <img src={currentGIF.src} /> }
-                </div> 
-            </div>
+  // ----------------------- Render -----------------------
+  return (
+    <div className="flex-container">
+      <div className="l-mascot" onClick={onMascotClick}>
+        <div className="text-Box">
+          <img
+            ref={textRef}
+            src={firstGIFs[0][0]}
+            className="isNot-Speaking"
+            alt="mascot text"
+            decoding="sync"
+            loading="eager"
+          />
         </div>
-    );
+        <div className="gif-Man">
+          <img
+            ref={gifRef}
+            src={manGIFs[0].src}
+            alt="mascot"
+            decoding="sync"
+            loading="eager"
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default Mascot

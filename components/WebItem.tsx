@@ -23,7 +23,7 @@ const WebItem = (props: Props) => {
    
     if (props.srcURL) {
         const regex = /github/i;
-        icon = (regex.test(props.srcURL)) ? "../img/Github.png" : "../img/Figma-Icon.svg";
+        icon = (regex.test(props.srcURL)) ? "../img/GitHub.png" : "../img/Figma-Icon.svg";
     }
 
 

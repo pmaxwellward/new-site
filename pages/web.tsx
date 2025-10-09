@@ -1,25 +1,20 @@
 import WebItem from "../components/WebItem";
 
 const portfolioItems = [
-    {
-        id: "trading-app",
-        itemURL: "https://pmw-trading-app.herokuapp.com/login",
-        class: "desktop-mobile",
-        img: ["./img/trading-app-desktop.png", "./img/trading-app-mobile.png"],
-        title: "Paper Trading App - Fullstack Web App",
-        srcURL: "https://github.com/pmaxwellward/trading-app/",
-        info: `A simple paper trading app that demonstrates the principles of full stack development.<br>
-            <br>
-            Create an account (do not use any self-identifying or sensitive information) and trade stocks with fake money. I use the IEX Cloud API for all the financial data.<br>   
-            <br>
-            The app is deployed on Heroku, and will take a moment to "wake up" upon initilization.<br>
-            <br>
-            Built with:<br>
-            - Flask (python)<br>
-            - Gunicorn (python)<br>
-            - HTML5/CSS/JavaScript<br>
-            - PostgreSQL<br>  
-            - Heroku`
+        {
+        id: "rollcall",
+        itemURL: "https://github.com/pmaxwellward/rollcall",
+        class: "desktop-only",
+        img: ["./img/rollcall.png"],
+        title: "RollCall - AI Media Identifier",
+        srcURL: "https://github.com/pmaxwellward/rollcall",
+        info: `An CLI tool that assist with renaming media files, specifically TV and Movies, by using OCR on the credits found in the media and uses AI to determine the title.<br>
+        <br>
+        Built with:<br>
+        - Python<br>
+        - Typer<br>
+        - ffmpeg<br>
+        - Google Gemini API`
     },
     {
         id: "product",
@@ -109,15 +104,17 @@ const WebRoute = () => {
     return (
         <main className="work-main">
             <div className="web-intro">
-                With my background in animation/design and skills in fullstack web development, I build web applications that are clear, functional, and entertaining.<br/>
-                <br/>
-                I use Figma and Adobe XD to mockup and prototype. <br/>
-                <br/>
-                I primarily use HTML5/CSS/JavaScript, Python, SQL, and webGL to build apps.<br/>
-                <br/>
-                I am also familiar with React, TypeScript, Node, REST APIs, git, and app deployment.<br/>
-                <br/>
-                Below are samples of my work with information on the technology used.<br/> 
+            
+            <p>With a foundation in animation and design, I build full-stack web apps that are clear, fast, and often a bit entertaining.</p>
+            <p>These days I split my time between creating web apps and experimenting with AI models.</p>
+            <p>
+                On the front end: React, Vue, TypeScript, and occasional WebGL/canvas when visuals matter.<br/>
+                On the back end: ASP.NET Core, Node.js and Python while using REST/GraphQL APIs and SQL databases.<br/>
+                In AI: LLM-powered features, retrieval/embeddings, prompt tooling, and evaluation to keep things reliable.<br/>
+            </p>
+            <p>I have also had a career as an animator and illustrator. <a href="/animation">Animation</a> <a href="/illustration" >Illustration</a></p>
+            <p>Below are samples of my work with notes on the tech used.</p>
+
             </div>
             {
                 portfolioItems.map((item) =>

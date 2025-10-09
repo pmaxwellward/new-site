@@ -21,21 +21,15 @@ const InfoRoute = () => {
                 I respect your time,<br/>
                 so I&apos;ll be brief.<br/>
                 <br/>
-                - Fullstack Development<br/>
-                - 2D/3D Animation<br/>
-                - Interactive media<br/>
-                - Cartooning/Illustration<br/>
-                <br/>
-                Q: Film festivals<br/>
-                Big clients?<br/>
-                <br/>
-                A: Yeah, a couple!<br/> 
+                I am Full Stack Developer<br/> 
+                with one foot firmly planted in Design<br/>
+                and the other stepping into AI Engineering.<br/>
                 <br/>
                 Check out my <br/>
-                <Link href="/work" passHref><a ><b>WORK</b></a></Link> | <Link href="files/pmaxwellward_resume_2022.pdf"><a><b>Resume</b></a></Link><br/>
+                <Link href="/web" passHref><b>WORK</b></Link> | <Link href="/files/P_Maxwell_Ward_Resume_2025.pdf"><b>Resume</b></Link><br/>
                 for more info.<br/>
                 <br/>
-                <strong><Link href={`mailto:${scramble()}`} passHref><a>{scramble()}</a></Link></strong>
+                <strong><Link href={`mailto:${scramble()}`} passHref>{scramble()}</Link></strong>
                 <br/>
             </p>
         </main>
