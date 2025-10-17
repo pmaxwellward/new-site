@@ -22,8 +22,8 @@ const InfoRoute = () => {
                 so I&apos;ll be brief.<br/>
                 <br/>
                 I am Full Stack Developer<br/> 
-                with one foot firmly planted in Design<br/>
-                and the other stepping into AI Engineering.<br/>
+                Interfaces, servers, and services:<br/>
+                built to work and easy on the eyes<br/>
                 <br/>
                 Check out my <br/>
                 <Link href="/web" passHref><b>WORK</b></Link> | <Link href="/files/P_Maxwell_Ward_Resume_2025.pdf"><b>Resume</b></Link><br/>
