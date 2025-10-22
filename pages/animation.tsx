@@ -74,16 +74,6 @@ const animationItems = [
             hence why the 2018 version features no personalities (except Santa). Still a charming spot.`
     },
     {
-        id: "alpha",
-        itemURL: "https://vimeo.com/293068530",
-        img: "./img/alpha.png",
-        title: "5 Ways To Be An Alpha Male | Short Film | 2D",
-        info: `I made this for The Backyard Film Festival in New Orleans. The theme was "Macho" and
-            this is what I came up with. I made the silly song in GarageBand and finished it in 
-            about 2 weeks in my spare time. I had fun doing it, but don't plan on tackling topical
-            subjects again.`
-    },
-    {
         id: "mashcots",
         itemURL: "https://vimeo.com/135125161",
         img: "./img/mashcots.png",
@@ -104,7 +94,7 @@ const animationItems = [
         id: "swallowedkin",
         itemURL: "https://vimeo.com/126224327",
         img: "./img/swallowedkin.png",
-        title: "Swalloed Kin | Short Film | 2D",
+        title: "Swallowed Kin | Short Film | 2D",
         info: `My first short film. It's a bit odd but we keep it around the for the good memories`
     }
 ]
